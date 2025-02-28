@@ -11,7 +11,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UpdateUserRequest {
     private String fullName;
-    private String password;
     private Integer gender;
     private String dateOfBirth;
     private Float height;
