@@ -54,6 +54,7 @@ public class UserService {
         return Optional.of(UserDTO.fromEntity(savedUser));
     }
 
+    @Transactional
     public Optional<UserDTO> updateUser(Long userId, UpdateUserRequest request) {
         Optional<User> userOptional = userRepository.findById(userId);
 
@@ -61,6 +62,7 @@ public class UserService {
             User user = userOptional.get();
 
             if (request.getFullName() != null) user.setFullName(request.getFullName());
+            if (request.getEmail() != null) user.setEmail(request.getEmail());
             if (request.getGender() != null) user.setGender(request.getGender());
             if (request.getDateOfBirth() != null) user.setDateOfBirth(request.getDateOfBirth());
             if (request.getHeight() != null) user.setHeight(request.getHeight());
