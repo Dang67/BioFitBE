@@ -1,9 +1,9 @@
 package com.example.biofitbe.controller;
 
-import com.example.biofitbe.model.LoginRequest;
-import com.example.biofitbe.model.RegisterRequest;
-import com.example.biofitbe.model.UpdateUserRequest;
-import com.example.biofitbe.model.UserDTO;
+import com.example.biofitbe.dto.LoginRequest;
+import com.example.biofitbe.dto.RegisterRequest;
+import com.example.biofitbe.dto.UpdateUserRequest;
+import com.example.biofitbe.dto.UserDTO;
 import com.example.biofitbe.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

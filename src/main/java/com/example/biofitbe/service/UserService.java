@@ -1,5 +1,9 @@
 package com.example.biofitbe.service;
 
+import com.example.biofitbe.dto.LoginRequest;
+import com.example.biofitbe.dto.RegisterRequest;
+import com.example.biofitbe.dto.UpdateUserRequest;
+import com.example.biofitbe.dto.UserDTO;
 import com.example.biofitbe.model.*;
 import com.example.biofitbe.repository.UserRepository;
 import jakarta.transaction.Transactional;

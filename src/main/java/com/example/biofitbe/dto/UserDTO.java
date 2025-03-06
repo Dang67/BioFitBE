@@ -1,5 +1,6 @@
-package com.example.biofitbe.model;
+package com.example.biofitbe.dto;
 
+import com.example.biofitbe.model.User;
 import lombok.*;
 
 @Getter

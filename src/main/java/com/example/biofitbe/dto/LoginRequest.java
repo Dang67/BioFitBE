@@ -1,4 +1,4 @@
-package com.example.biofitbe.model;
+package com.example.biofitbe.dto;
 
 import lombok.Getter;
 import lombok.Setter;

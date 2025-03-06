@@ -1,7 +1,12 @@
 package com.example.biofitbe.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "user")
@@ -45,4 +50,8 @@ public class User {
 
     @Column(name = "created_account", nullable = false)
     private String createdAccount;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<DailyWeight> dailyWeights = new ArrayList<>();
 }
