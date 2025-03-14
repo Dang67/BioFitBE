@@ -15,7 +15,7 @@ public class DailyLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "daily_log_id")
-    private Long dailyWeightId;
+    private Long dailyLogId;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

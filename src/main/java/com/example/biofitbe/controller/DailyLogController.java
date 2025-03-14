@@ -29,7 +29,7 @@ public class DailyLogController {
             @PathVariable String date) {
         Optional<DailyLog> existingWeight = dailyLogService.findDailyLogByUserIdAndDate(userId, date);
         return existingWeight.map(weight -> ResponseEntity.ok(new DailyLogDTO(
-                weight.getDailyWeightId(),
+                weight.getDailyLogId(),
                 weight.getUser().getUserId(),
                 weight.getWeight(),
                 weight.getWater(),

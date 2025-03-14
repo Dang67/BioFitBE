@@ -29,7 +29,7 @@ public class DailyLogService {
 
         DailyLog weight = weights.get(0);
         return new DailyLogDTO(
-                weight.getDailyWeightId(),
+                weight.getDailyLogId(),
                 weight.getUser().getUserId(),
                 weight.getWeight(),
                 weight.getWater(),
