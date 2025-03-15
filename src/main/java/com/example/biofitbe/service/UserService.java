@@ -10,7 +10,13 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -58,7 +64,7 @@ public class UserService {
         return Optional.of(UserDTO.fromEntity(savedUser));
     }
 
-    @Transactional
+    /*@Transactional
     public Optional<UserDTO> updateUser(Long userId, UpdateUserRequest request) {
         Optional<User> userOptional = userRepository.findById(userId);
 
@@ -75,6 +81,67 @@ public class UserService {
             if (request.getAvatar() != null) user.setAvatar(request.getAvatar());
 
             userRepository.save(user);
+
+            return Optional.of(UserDTO.fromEntity(user));
+        }
+
+        return Optional.empty();
+    }*/
+
+    @Transactional
+    public Optional<UserDTO> updateUser(Long userId, UpdateUserRequest request, MultipartFile avatar) {
+        Optional<User> userOptional = userRepository.findById(userId);
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            boolean isUpdated = false;
+
+            if (request.getFullName() != null) {
+                user.setFullName(request.getFullName());
+                isUpdated = true;
+            }
+            if (request.getEmail() != null) {
+                user.setEmail(request.getEmail());
+                isUpdated = true;
+            }
+            if (request.getGender() != null) {
+                user.setGender(request.getGender());
+                isUpdated = true;
+            }
+            if (request.getDateOfBirth() != null) {
+                user.setDateOfBirth(request.getDateOfBirth());
+                isUpdated = true;
+            }
+            if (request.getHeight() != null) {
+                user.setHeight(request.getHeight());
+                isUpdated = true;
+            }
+            if (request.getWeight() != null) {
+                user.setWeight(request.getWeight());
+                isUpdated = true;
+            }
+            if (request.getTargetWeight() != null) {
+                user.setTargetWeight(request.getTargetWeight());
+                isUpdated = true;
+            }
+
+            if (avatar != null && !avatar.isEmpty()) {
+                try {
+                    byte[] avatarBytes = avatar.getBytes();
+                    System.out.println("Received avatar with size: " + avatarBytes.length);
+                    user.setAvatar(avatarBytes);
+                    isUpdated = true;
+                } catch (IOException e) {
+                    System.out.println("Error reading avatar file" + e.getMessage());
+                    throw new RuntimeException("Error reading avatar file", e);
+                }
+            } else {
+                System.out.println("No avatar received in request");
+            }
+
+            if (isUpdated) {
+                userRepository.save(user);
+            }
 
             return Optional.of(UserDTO.fromEntity(user));
         }

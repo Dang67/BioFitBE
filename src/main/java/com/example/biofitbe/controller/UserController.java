@@ -5,11 +5,15 @@ import com.example.biofitbe.dto.RegisterRequest;
 import com.example.biofitbe.dto.UpdateUserRequest;
 import com.example.biofitbe.dto.UserDTO;
 import com.example.biofitbe.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.List;
@@ -64,12 +68,28 @@ public class UserController {
         }
     }
 
-    @PutMapping("/update/{userId}")
+    /*@PutMapping("/update/{userId}")
     public ResponseEntity<?> updateUser(
             @PathVariable Long userId,
             @RequestBody UpdateUserRequest updateUserRequest) {
 
         Optional<UserDTO> updatedUser = userService.updateUser(userId, updateUserRequest);
+
+        if (updatedUser.isPresent()) {
+            return ResponseEntity.ok(updatedUser.get()); // Trả về thông tin user sau khi cập nhật
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("message", "User not found"));
+        }
+    }*/
+
+    @PutMapping(value = "/update/{userId}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<?> updateUser(
+            @PathVariable Long userId,
+            @RequestPart(value = "avatar", required = false) MultipartFile avatar,
+            @RequestPart("user") UpdateUserRequest updateUserRequest) {
+
+        Optional<UserDTO> updatedUser = userService.updateUser(userId, updateUserRequest, avatar);
 
         if (updatedUser.isPresent()) {
             return ResponseEntity.ok(updatedUser.get()); // Trả về thông tin user sau khi cập nhật

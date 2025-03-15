@@ -17,5 +17,4 @@ public class UpdateUserRequest {
     private Float height;
     private Float weight;
     private Float targetWeight;
-    private String avatar;
 }

@@ -44,8 +44,11 @@ public class User {
     @Column(name = "date_of_birth", nullable = true)
     private String dateOfBirth;
 
-    @Column(name = "avatar", nullable = true)
-    private String avatar;
+    /*@Column(name = "avatar", nullable = true)
+    private String avatar;*/
+    @Lob // Chỉ định lưu dữ liệu lớn (Large Object)
+    @Column(name = "avatar", columnDefinition = "LONGBLOB")
+    private byte[] avatar;  // Lưu ảnh dưới dạng mảng byte
 
     @Column(name = "created_account", nullable = false)
     private String createdAccount;
