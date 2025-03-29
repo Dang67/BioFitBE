@@ -50,6 +50,7 @@ public class UserDTO {
         dto.height = user.getHeight();
         dto.weight = user.getWeight();
         dto.targetWeight = user.getTargetWeight();
+        dto.createdAccount = user.getCreatedAccount();
 
         // Chuyển đổi ảnh từ byte[] sang Base64
         if (user.getAvatar() != null) {
