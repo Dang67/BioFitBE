@@ -4,7 +4,9 @@ import com.example.biofitbe.config.VnPayConfig;
 import com.example.biofitbe.dto.PaymentRequest;
 import com.example.biofitbe.dto.PaymentResponse;
 import com.example.biofitbe.model.Payment;
+import com.example.biofitbe.model.User;
 import com.example.biofitbe.repository.PaymentRepository;
+import com.example.biofitbe.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,10 @@ import java.util.*;
 
 @Service
 public class VnPayService {
+
+    @Autowired
+    private UserRepository userRepository;
+
     @Autowired
     private VnPayConfig vnPayConfig;
 
@@ -118,9 +124,12 @@ public class VnPayService {
             // Xây dựng URL thanh toán
             String paymentUrl = vnPayConfig.getVnpPayUrl() + "?" + query;
 
+            User user = userRepository.findByUserId(request.getUserId())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
             // Lưu thông tin thanh toán vào db
             Payment payment = Payment.builder()
-                    .userId(request.getUserId())
+                    .user(user)
                     .orderId(orderId)
                     .amount(amount)
                     .planType(request.getPlanType())
@@ -186,6 +195,9 @@ public class VnPayService {
                 payment.setPaidAt(LocalDateTime.now());
             }
             paymentRepository.save(payment);
+
+            // Thêm log để kiểm tra
+            System.out.println("Payment status updated: " + payment.getPaymentStatus());
         }
     }
 

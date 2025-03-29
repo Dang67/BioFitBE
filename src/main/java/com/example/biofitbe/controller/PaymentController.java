@@ -134,6 +134,10 @@ public class PaymentController {
         if (optPayment.isPresent()) {
             Payment payment = optPayment.get();
 
+            // Đảm bảo cập nhật payment status
+            payment.setPaymentStatus("COMPLETED");
+            paymentRepository.save(payment);
+
             // Tính toán thời gian hết hạn (1 năm cho gói YEARLY, 1 tháng cho gói MONTHLY)
             LocalDateTime startDate = LocalDateTime.now();
             LocalDateTime endDate;
@@ -146,7 +150,7 @@ public class PaymentController {
 
             // Tạo subscription
             Subscription subscription = Subscription.builder()
-                    .userId(payment.getUserId())
+                    .userId(payment.getUser().getUserId())
                     .planType(payment.getPlanType())
                     .startDate(startDate)
                     .endDate(endDate)
