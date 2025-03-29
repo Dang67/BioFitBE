@@ -1,9 +1,12 @@
 package com.example.biofitbe.dto;
 
+import com.example.biofitbe.model.Payment;
 import com.example.biofitbe.model.User;
 import lombok.*;
 
 import java.util.Base64;
+import java.util.Comparator;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -21,6 +24,7 @@ public class UserDTO {
     private String dateOfBirth;
     private String avatar;
     private String createdAccount;
+    private String paymentStatus;
 
     /*public static UserDTO fromEntity(User user) {
         return UserDTO.builder()
@@ -54,6 +58,22 @@ public class UserDTO {
             dto.avatar = null;
         }
 
+        // Find the latest completed payment for this user
+        Optional<Payment> latestCompletedPayment = user.getPayments().stream()
+                .filter(payment -> "COMPLETED".equals(payment.getPaymentStatus()))
+                .max(Comparator.comparing(Payment::getPaidAt));
+
+        // Set payment status
+        dto.paymentStatus = latestCompletedPayment.isPresent() ? "COMPLETED" : "PENDING";
+
+        // Chuyển đổi ảnh từ byte[] sang Base64
+        if (user.getAvatar() != null) {
+            dto.avatar = Base64.getEncoder().encodeToString(user.getAvatar());
+        } else {
+            dto.avatar = null;
+        }
+
         return dto;
     }
+
 }

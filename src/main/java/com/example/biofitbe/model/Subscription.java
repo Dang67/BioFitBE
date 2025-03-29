@@ -23,7 +23,7 @@ public class Subscription {
     @Column(name = "userId", nullable = false)
     private Long userId;
 
-    @Column(name = "plan_type", nullable = false)
+    @Column(name = "subscription_type", nullable = false)
     private String planType;
 
     @Column(name = "start_date", nullable = false)
