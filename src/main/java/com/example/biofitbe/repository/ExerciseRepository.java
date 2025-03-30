@@ -26,4 +26,6 @@ public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
             @Param("exerciseGoal") Integer exerciseGoal,
             @Param("intensity") Integer intensity
     );
+
+    long countByUserUserId(Long userId);
 }
