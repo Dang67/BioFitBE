@@ -87,4 +87,9 @@ public class ExerciseDoneService {
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         return exerciseDoneRepository.getTotalBurnedCaloriesToday(userId, today);
     }
+
+    public Float getTotalExerciseDoneTimeToday(Long userId) {
+        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        return exerciseDoneRepository.getTotalExerciseDoneTimeToday(userId, today);
+    }
 }

@@ -51,4 +51,10 @@ public class ExerciseDoneController {
         Float totalBurnedCalories = exerciseDoneService.getTotalBurnedCaloriesToday(userId);
         return ResponseEntity.ok(totalBurnedCalories != null ? totalBurnedCalories : 0.0);
     }
+
+    @GetMapping("/time/today")
+    public ResponseEntity<Double> getTotalExerciseDoneTimeToday(@RequestParam Long userId) {
+        Float totalExerciseDoneTime = exerciseDoneService.getTotalExerciseDoneTimeToday(userId);
+        return ResponseEntity.ok(totalExerciseDoneTime != null ? totalExerciseDoneTime : 0.0);
+    }
 }

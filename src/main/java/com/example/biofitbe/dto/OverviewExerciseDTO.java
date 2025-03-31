@@ -11,6 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class OverviewExerciseDTO {
     private String exerciseName;
+    private Integer level;
+    private Integer intensity;
     private Float time;
     private Float burnedCalories;
     private String date;

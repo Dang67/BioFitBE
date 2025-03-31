@@ -21,7 +21,7 @@ public interface ExerciseDoneRepository extends JpaRepository<ExerciseDone, Long
                                                 @Param("endDate") String endDate);
 
     @Query("SELECT new com.example.biofitbe.dto.OverviewExerciseDTO(" +
-            "e.exerciseName, ed.time, ed.burnedCalories, edone.date, edone.session) " +
+            "e.exerciseName, ed.exerciseGoal, ed.intensity, ed.time, ed.burnedCalories, edone.date, edone.session) " +
             "FROM ExerciseDone edone " +
             "JOIN edone.exerciseDetail ed " +
             "JOIN ed.exercise e " +
@@ -39,6 +39,17 @@ public interface ExerciseDoneRepository extends JpaRepository<ExerciseDone, Long
             "WHERE e.user.userId = :userId " +
             "AND edone.date = :today")
     Float getTotalBurnedCaloriesToday(
+            @Param("userId") Long userId,
+            @Param("today") String today
+    );
+
+    @Query("SELECT SUM(ed.time) " +
+            "FROM ExerciseDone edone " +
+            "JOIN edone.exerciseDetail ed " +
+            "JOIN ed.exercise e " +
+            "WHERE e.user.userId = :userId " +
+            "AND edone.date = :today")
+    Float getTotalExerciseDoneTimeToday(
             @Param("userId") Long userId,
             @Param("today") String today
     );
