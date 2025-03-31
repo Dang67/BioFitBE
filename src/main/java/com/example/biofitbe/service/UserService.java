@@ -1,9 +1,6 @@
 package com.example.biofitbe.service;
 
-import com.example.biofitbe.dto.LoginRequest;
-import com.example.biofitbe.dto.RegisterRequest;
-import com.example.biofitbe.dto.UpdateUserRequest;
-import com.example.biofitbe.dto.UserDTO;
+import com.example.biofitbe.dto.*;
 import com.example.biofitbe.model.*;
 import com.example.biofitbe.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -16,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class UserService {
@@ -148,5 +146,90 @@ public class UserService {
         }
 
         return Optional.empty();
+    }
+
+    @Transactional
+    public PasswordResetResponse requestPasswordReset(PasswordResetRequest requestDTO) {
+        Optional<User> userOptional = userRepository.findByEmail(requestDTO.getEmail());
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+
+            // Generate a random 6-digit code
+            String resetCode = String.format("%06d", new Random().nextInt(999999));
+
+            // Set expiry time (30 minutes from now)
+            LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(30);
+
+            user.setResetCode(resetCode);
+            user.setResetCodeExpiry(expiryTime);
+
+            userRepository.save(user);
+
+            // ghi nhật ký trong ter
+            System.out.println("Reset code for " + requestDTO.getEmail() + ": " + resetCode);
+
+            return PasswordResetResponse.builder()
+                    .success(true)
+                    .message("Password reset code sent to your email. Valid for 30 minutes.")
+                    .resetCode(resetCode)
+                    .build();
+        }
+
+        return PasswordResetResponse.builder()
+                .success(false)
+                .message("User with this email not found.")
+                .build();
+    }
+
+    @Transactional
+    public PasswordResetResponse resetPassword(PasswordResetConfirm confirmDTO) {
+        Optional<User> userOptional = userRepository.findByEmail(confirmDTO.getEmail());
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+
+            // Kiểm tra xem mã reset có hợp lệ ko
+            if (user.getResetCode() == null || !user.getResetCode().equals(confirmDTO.getResetCode())) {
+                return PasswordResetResponse.builder()
+                        .success(false)
+                        .message("Invalid reset code.")
+                        .build();
+            }
+
+            if (user.getResetCodeExpiry() == null || user.getResetCodeExpiry().isBefore(LocalDateTime.now())) {
+                return PasswordResetResponse.builder()
+                        .success(false)
+                        .message("Reset code has expired. Please request a new one.")
+                        .build();
+            }
+
+            // Xác thực mật khẩu
+            if (confirmDTO.getNewPassword() == null || confirmDTO.getNewPassword().length() < 6) {
+                return PasswordResetResponse.builder()
+                        .success(false)
+                        .message("Password must be at least 6 characters long.")
+                        .build();
+            }
+
+            // Mã hóa mật khẩu mới
+            user.setHashPassword(passwordEncoder.encode(confirmDTO.getNewPassword()));
+
+            // Xóa mã reset
+            user.setResetCode(null);
+            user.setResetCodeExpiry(null);
+
+            userRepository.save(user);
+
+            return PasswordResetResponse.builder()
+                    .success(true)
+                    .message("Password has been reset successfully.")
+                    .build();
+        }
+
+        return PasswordResetResponse.builder()
+                .success(false)
+                .message("User with this email not found.")
+                .build();
     }
 }
