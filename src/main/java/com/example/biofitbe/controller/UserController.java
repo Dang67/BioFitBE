@@ -1,9 +1,6 @@
 package com.example.biofitbe.controller;
 
-import com.example.biofitbe.dto.LoginRequest;
-import com.example.biofitbe.dto.RegisterRequest;
-import com.example.biofitbe.dto.UpdateUserRequest;
-import com.example.biofitbe.dto.UserDTO;
+import com.example.biofitbe.dto.*;
 import com.example.biofitbe.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -96,6 +93,31 @@ public class UserController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Collections.singletonMap("message", "User not found"));
+        }
+    }
+
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<PasswordResetResponse> requestPasswordReset(
+            @RequestBody PasswordResetRequest requestDTO) {
+        PasswordResetResponse response = userService.requestPasswordReset(requestDTO);
+
+        if (response.isSuccess()) {
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<PasswordResetResponse> resetPassword(
+            @RequestBody PasswordResetConfirm confirmDTO) {
+        PasswordResetResponse response = userService.resetPassword(confirmDTO);
+
+        if (response.isSuccess()) {
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 }

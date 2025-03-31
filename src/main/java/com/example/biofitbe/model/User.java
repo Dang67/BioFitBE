@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,6 +53,12 @@ public class User {
 
     @Column(name = "created_account", nullable = false)
     private String createdAccount;
+
+    @Column(name = "reset_code", nullable = true)
+    private String resetCode;
+
+    @Column(name = "reset_code_expiry", nullable = true)
+    private LocalDateTime resetCodeExpiry;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
