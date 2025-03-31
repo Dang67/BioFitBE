@@ -119,6 +119,59 @@ public class ExerciseService {
         return details;
     }
 
+    /**
+     * Khởi tạo các bài tập mặc định cho user mới
+     */
+    @Transactional
+    public void initializeDefaultExercises(Long userId) {
+        // Kiểm tra nếu user đã có bài tập nào chưa (để tránh tạo trùng lặp)
+        if (exerciseRepository.countByUserUserId(userId) > 0) {
+            return;
+        }
+
+        List<ExerciseDTO> defaultExercises = List.of(
+                new ExerciseDTO(null, userId, "Pull-ups", List.of(new ExerciseDetailDTO(null, null, 0, 0, 5f, 30f))),
+                new ExerciseDTO(null, userId, "Squats", List.of(new ExerciseDetailDTO(null, null, 0, 0, 10f, 50f))),
+                new ExerciseDTO(null, userId, "Lunges", List.of(new ExerciseDetailDTO(null, null, 0, 0, 8f, 45f))),
+                new ExerciseDTO(null, userId, "Plank", List.of(new ExerciseDetailDTO(null, null, 0, 0, 5f, 25f))),
+                new ExerciseDTO(null, userId, "Deadlifts", List.of(new ExerciseDetailDTO(null, null, 0, 0, 10f, 60f))),
+                new ExerciseDTO(null, userId, "Bench Press", List.of(new ExerciseDetailDTO(null, null, 0, 0, 10f, 55f))),
+                new ExerciseDTO(null, userId, "Overhead Press", List.of(new ExerciseDetailDTO(null, null, 0, 0, 10f, 50f))),
+                new ExerciseDTO(null, userId, "Bicep Curls", List.of(new ExerciseDetailDTO(null, null, 0, 0, 8f, 35f))),
+                new ExerciseDTO(null, userId, "Triceps Dips", List.of(new ExerciseDetailDTO(null, null, 0, 0, 8f, 40f))),
+                new ExerciseDTO(null, userId, "Jump Rope", List.of(new ExerciseDetailDTO(null, null, 0, 0, 5f, 60f))),
+                new ExerciseDTO(null, userId, "Burpees", List.of(new ExerciseDetailDTO(null, null, 0, 0, 5f, 70f))),
+                new ExerciseDTO(null, userId, "Mountain Climbers", List.of(new ExerciseDetailDTO(null, null, 0, 0, 5f, 50f))),
+                new ExerciseDTO(null, userId, "Sit-ups", List.of(new ExerciseDetailDTO(null, null, 0, 0, 10f, 40f))),
+                new ExerciseDTO(null, userId, "Crunches", List.of(new ExerciseDetailDTO(null, null, 0, 0, 10f, 35f))),
+                new ExerciseDTO(null, userId, "Russian Twists", List.of(new ExerciseDetailDTO(null, null, 0, 0, 8f, 40f))),
+                new ExerciseDTO(null, userId, "Leg Raises", List.of(new ExerciseDetailDTO(null, null, 0, 0, 8f, 35f))),
+                new ExerciseDTO(null, userId, "Jump Squats", List.of(new ExerciseDetailDTO(null, null, 0, 0, 5f, 55f))),
+                new ExerciseDTO(null, userId, "Box Jumps", List.of(new ExerciseDetailDTO(null, null, 0, 0, 5f, 60f))),
+                new ExerciseDTO(null, userId, "Calf Raises", List.of(new ExerciseDetailDTO(null, null, 0, 0, 10f, 30f))),
+                new ExerciseDTO(null, userId, "Kettlebell Swings", List.of(new ExerciseDetailDTO(null, null, 0, 0, 8f, 55f))),
+                new ExerciseDTO(null, userId, "Medicine Ball Slams", List.of(new ExerciseDetailDTO(null, null, 0, 0, 8f, 50f))),
+                new ExerciseDTO(null, userId, "Dumbbell Rows", List.of(new ExerciseDetailDTO(null, null, 0, 0, 8f, 45f))),
+                new ExerciseDTO(null, userId, "Lat Pulldown", List.of(new ExerciseDetailDTO(null, null, 0, 0, 10f, 50f))),
+                new ExerciseDTO(null, userId, "Face Pulls", List.of(new ExerciseDetailDTO(null, null, 0, 0, 8f, 40f))),
+                new ExerciseDTO(null, userId, "Side Plank", List.of(new ExerciseDetailDTO(null, null, 0, 0, 5f, 20f))),
+                new ExerciseDTO(null, userId, "Flutter Kicks", List.of(new ExerciseDetailDTO(null, null, 0, 0, 5f, 30f))),
+                new ExerciseDTO(null, userId, "Bicycle Crunches", List.of(new ExerciseDetailDTO(null, null, 0, 0, 5f, 35f))),
+                new ExerciseDTO(null, userId, "Superman Exercise", List.of(new ExerciseDetailDTO(null, null, 0, 0, 5f, 25f))),
+                new ExerciseDTO(null, userId, "Reverse Crunches", List.of(new ExerciseDetailDTO(null, null, 0, 0, 8f, 35f))),
+                new ExerciseDTO(null, userId, "Glute Bridges", List.of(new ExerciseDetailDTO(null, null, 0, 0, 8f, 40f))),
+                new ExerciseDTO(null, userId, "Hip Thrusts", List.of(new ExerciseDetailDTO(null, null, 0, 0, 8f, 50f))),
+                new ExerciseDTO(null, userId, "Wall Sit", List.of(new ExerciseDetailDTO(null, null, 0, 0, 5f, 30f))),
+                new ExerciseDTO(null, userId, "Farmers Walk", List.of(new ExerciseDetailDTO(null, null, 0, 0, 10f, 55f))),
+                new ExerciseDTO(null, userId, "Jumping Jacks", List.of(new ExerciseDetailDTO(null, null, 0, 0, 5f, 50f)))
+        );
+
+        // Tạo các bài tập mặc định
+        for (ExerciseDTO exerciseDTO : defaultExercises) {
+            createExercise(exerciseDTO);
+        }
+    }
+
     public void deleteExercise(Long exerciseId) {
         Exercise exercise = exerciseRepository.findById(exerciseId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exercise not found with ID: " + exerciseId));

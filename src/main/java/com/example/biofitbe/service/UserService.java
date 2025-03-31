@@ -23,6 +23,9 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private ExerciseService exerciseService;
+
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
@@ -54,6 +57,9 @@ public class UserService {
         user.setCreatedAccount(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
 
         User savedUser = userRepository.save(user);
+
+        // Khởi tạo các bài tập mặc định sau khi tạo user thành công
+        exerciseService.initializeDefaultExercises(savedUser.getUserId());
         return Optional.of(UserDTO.fromEntity(savedUser));
     }
 
