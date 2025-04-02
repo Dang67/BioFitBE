@@ -6,6 +6,7 @@ import com.example.biofitbe.model.Payment;
 import com.example.biofitbe.model.Subscription;
 import com.example.biofitbe.repository.PaymentRepository;
 import com.example.biofitbe.repository.SubscriptionRepository;
+import com.example.biofitbe.service.MoMoService;
 import com.example.biofitbe.service.VnPayService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class PaymentController {
 
     @Autowired
     private VnPayService vnPayService;
+
+    @Autowired
+    private MoMoService moMoService;
 
     @Autowired
     private PaymentRepository paymentRepository;
@@ -45,7 +49,7 @@ public class PaymentController {
 
     // Tạo thanh toán
     @PostMapping("/create-payment")
-    public ResponseEntity<PaymentResponse> createPayment(@RequestBody PaymentRequest request, HttpServletRequest httpRequest) {
+    public ResponseEntity<PaymentResponse> createPayment(@RequestBody PaymentRequest request, HttpServletRequest httpRequest) throws Exception {
         // Lấy địa chỉ IP của khách hàng để truyền vào request
         String ipAddress = httpRequest.getRemoteAddr();
         request.setIpAddress(ipAddress);
@@ -53,11 +57,11 @@ public class PaymentController {
         PaymentResponse response;
         if ("VNPAY".equals(request.getPaymentMethod())) {
             response = vnPayService.createPayment(request);
+        } else if ("MOMO".equals(request.getPaymentMethod())) {
+            response = moMoService.createPayment(request);
         } else {
-            // Để triển khai MOMO trong tương lai.
             response = new PaymentResponse(false, "Payment method not supported yet", null, null);
         }
-
         return ResponseEntity.ok(response);
     }
 
@@ -79,7 +83,6 @@ public class PaymentController {
                 // Chuyển hướng về ứng dụng với các tham số đăng kí thành công
                 String redirectUrl = "biofit://payment/callback?vnp_ResponseCode=" + vnpResponseCode +
                         "&vnp_TxnRef=" + vnpTxnRef;
-
                 return ResponseEntity.status(HttpStatus.FOUND)
                         .header("Location", redirectUrl)
                         .build();
@@ -105,6 +108,45 @@ public class PaymentController {
         }
     }
 
+    // Xử lý phản hồi từ MoMo (Redirect URL)
+    // Trong PaymentController.java
+    @GetMapping("/momo-return")
+    public ResponseEntity<String> momoReturn(HttpServletRequest request) {
+        Map<String, String> params = extractParams(request);
+        String orderId = params.get("orderId");
+        String resultCode = params.get("resultCode");
+
+        try {
+            if (moMoService.validatePaymentCallback(params)) {
+                if ("0".equals(resultCode)) {
+                    moMoService.updatePaymentStatus(orderId, "COMPLETED");
+                    createSubscription(orderId);
+
+                    String redirectUrl = "biofit://payment/callback?resultCode=" + resultCode +
+                            "&orderId=" + orderId;
+                    return ResponseEntity.status(HttpStatus.FOUND)
+                            .header("Location", redirectUrl)
+                            .build();
+                } else {
+                    moMoService.updatePaymentStatus(orderId, "FAILED");
+                    String redirectUrl = "biofit://payment/callback?resultCode=" + resultCode +
+                            "&orderId=" + orderId;
+                    return ResponseEntity.status(HttpStatus.FOUND)
+                            .header("Location", redirectUrl)
+                            .build();
+                }
+            } else {
+                String redirectUrl = "biofit://payment/callback?error=invalid_signature";
+                return ResponseEntity.status(HttpStatus.FOUND)
+                        .header("Location", redirectUrl)
+                        .build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error processing MoMo callback: " + e.getMessage());
+        }
+    }
+
     // Thêm endpoint mới để xử lý IPN của VNPay
     @PostMapping("/vnPay-ipn")
     public ResponseEntity<String> vnpayIpn(HttpServletRequest request) {
@@ -125,6 +167,32 @@ public class PaymentController {
             }
         } else {
             return ResponseEntity.ok("{\"RspCode\":\"97\",\"Message\":\"Invalid Signature\"}");
+        }
+    }
+
+    // Xử lý thông báo từ MoMo (IPN URL)
+    @PostMapping("/momo-notify")
+    public ResponseEntity<String> momoNotify(HttpServletRequest request) {
+        Map<String, String> params = extractParams(request);
+        String orderId = params.get("orderId");
+        String resultCode = params.get("resultCode");
+
+        try {
+            if (moMoService.validatePaymentCallback(params)) {
+                if ("0".equals(resultCode)) {
+                    moMoService.updatePaymentStatus(orderId, "COMPLETED");
+                    createSubscription(orderId);
+                    return ResponseEntity.ok("{\"result\":\"success\"}");
+                } else {
+                    moMoService.updatePaymentStatus(orderId, "FAILED");
+                    return ResponseEntity.ok("{\"result\":\"failed\"}");
+                }
+            } else {
+                return ResponseEntity.ok("{\"result\":\"invalid_signature\"}");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error: " + e.getMessage());
         }
     }
 
@@ -161,4 +229,4 @@ public class PaymentController {
             subscriptionRepository.save(subscription);
         }
     }
-}	
+}
