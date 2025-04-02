@@ -1,4 +1,4 @@
-package com.example.biofitbe.service;
+package com.example.biofitbe.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

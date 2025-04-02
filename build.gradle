@@ -9,7 +9,7 @@ version = '0.0.1-SNAPSHOT'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(23)
     }
 }
 
@@ -35,6 +35,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation'com.fasterxml.jackson.core:jackson-databind'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation 'commons-codec:commons-codec:1.15'
+
 }
 
 tasks.named('test') {
