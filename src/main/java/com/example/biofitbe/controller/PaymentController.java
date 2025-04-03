@@ -182,10 +182,10 @@ public class PaymentController {
                 if ("0".equals(resultCode)) {
                     moMoService.updatePaymentStatus(orderId, "COMPLETED");
                     createSubscription(orderId);
-                    return ResponseEntity.ok("{\"result\":\"success\"}");
+                    return ResponseEntity.ok("{\"resultCode\":\"0\",\"message\":\"Success\"}");
                 } else {
                     moMoService.updatePaymentStatus(orderId, "FAILED");
-                    return ResponseEntity.ok("{\"result\":\"failed\"}");
+                    return ResponseEntity.ok("{\"resultCode\":\"99\",\"message\":\"Failed\"}");
                 }
             } else {
                 return ResponseEntity.ok("{\"result\":\"invalid_signature\"}");
