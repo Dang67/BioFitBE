@@ -15,4 +15,6 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
 
     @Query("SELECT s FROM Subscription s WHERE s.userId = :userId ORDER BY s.endDate DESC LIMIT 1")
     Optional<Subscription> findLatestSubscription(@Param("userId") long userId);
+
+    Long userId(Long userId);
 }

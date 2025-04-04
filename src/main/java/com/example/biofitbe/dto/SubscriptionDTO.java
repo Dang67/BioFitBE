@@ -1,5 +1,6 @@
 package com.example.biofitbe.dto;
 
+import com.example.biofitbe.model.Subscription;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,4 +17,6 @@ public class SubscriptionDTO {
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private boolean isActive;
+    private int totalSubscriptionDays;
 }
+    

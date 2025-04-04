@@ -35,6 +35,9 @@ public class Subscription {
     @Column(name = "active", nullable = false)
     private boolean isActive;
 
+    @Column(name = "total_subscription_days",  nullable = false)
+    private int totalSubscriptionDays;
+
     @OneToOne
     @JoinColumn(name = "payment_id")
     private Payment payment;

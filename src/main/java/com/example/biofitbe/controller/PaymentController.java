@@ -9,6 +9,7 @@ import com.example.biofitbe.repository.SubscriptionRepository;
 import com.example.biofitbe.service.MoMoService;
 import com.example.biofitbe.service.VnPayService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -182,10 +183,10 @@ public class PaymentController {
                 if ("0".equals(resultCode)) {
                     moMoService.updatePaymentStatus(orderId, "COMPLETED");
                     createSubscription(orderId);
-                    return ResponseEntity.ok("{\"result\":\"success\"}");
+                    return ResponseEntity.ok("{\"resultCode\":\"0\",\"message\":\"Success\"}");
                 } else {
                     moMoService.updatePaymentStatus(orderId, "FAILED");
-                    return ResponseEntity.ok("{\"result\":\"failed\"}");
+                    return ResponseEntity.ok("{\"resultCode\":\"99\",\"message\":\"Failed\"}");
                 }
             } else {
                 return ResponseEntity.ok("{\"result\":\"invalid_signature\"}");
@@ -206,27 +207,58 @@ public class PaymentController {
             payment.setPaymentStatus("COMPLETED");
             paymentRepository.save(payment);
 
-            // Tính toán thời gian hết hạn (1 năm cho gói YEARLY, 1 tháng cho gói MONTHLY)
-            LocalDateTime startDate = LocalDateTime.now();
-            LocalDateTime endDate;
+            Long userId = payment.getUser().getUserId();
 
+            // Tính số ngày được thêm dựa vào loại gói
+            int daysToAdd;
             if ("YEARLY".equals(payment.getPlanType())) {
-                endDate = startDate.plusYears(1);
+                daysToAdd = 365; // Hoặc 366 nếu bạn muốn xét năm nhuận
             } else {
-                endDate = startDate.plusMonths(1);
+                daysToAdd = 30; // Hoặc tính chính xác số ngày của tháng
             }
 
-            // Tạo subscription
-            Subscription subscription = Subscription.builder()
-                    .userId(payment.getUser().getUserId())
-                    .planType(payment.getPlanType())
-                    .startDate(startDate)
-                    .endDate(endDate)
-                    .isActive(true)
-                    .payment(payment)
-                    .build();
+            // Kiểm tra người dùng đã có subscription đang active chưa
+            Optional<Subscription> existingSubscription = subscriptionRepository.findByUserIdAndIsActiveTrue(userId);
 
-            subscriptionRepository.save(subscription);
+            if (existingSubscription.isPresent()) {
+                // Nếu đã có subscription active, cộng thêm thời gian
+                Subscription currentSub = getSubscription(existingSubscription, daysToAdd);
+                subscriptionRepository.save(currentSub);
+            } else {
+                // Nếu chưa có subscription active, tạo mới
+                LocalDateTime startDate = LocalDateTime.now();
+                LocalDateTime endDate = startDate.plusDays(daysToAdd);
+
+                // Tạo subscription mới
+                Subscription subscription = Subscription.builder()
+                        .userId(userId)
+                        .planType(payment.getPlanType())
+                        .startDate(startDate)
+                        .endDate(endDate)
+                        .isActive(true)
+                        .totalSubscriptionDays(daysToAdd)
+                        .payment(payment)
+                        .build();
+
+                subscriptionRepository.save(subscription);
+            }
         }
+    }
+
+    @NotNull
+    private static Subscription getSubscription(Optional<Subscription> existingSubscription, int daysToAdd) {
+        Subscription currentSub = existingSubscription.get();
+
+        // Lấy endDate hiện tại làm cơ sở để cộng thêm
+        LocalDateTime currentEndDate = currentSub.getEndDate();
+        LocalDateTime newEndDate = currentEndDate.plusDays(daysToAdd);
+
+        // Cập nhật tổng số ngày đăng ký
+        int newTotalDays = currentSub.getTotalSubscriptionDays() + daysToAdd;
+
+        // Cập nhật subscription hiện tại
+        currentSub.setEndDate(newEndDate);
+        currentSub.setTotalSubscriptionDays(newTotalDays);
+        return currentSub;
     }
 }
