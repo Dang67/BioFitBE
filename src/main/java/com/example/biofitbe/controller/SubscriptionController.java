@@ -5,6 +5,7 @@ import com.example.biofitbe.model.Subscription;
 import com.example.biofitbe.repository.SubscriptionRepository;
 import com.example.biofitbe.service.SubscriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -62,5 +63,25 @@ public class SubscriptionController {
     public ResponseEntity<Boolean> checkSubscription(@PathVariable long userId) {
         boolean isExpired = subscriptionService.isSubscriptionExpired(userId);
         return ResponseEntity.ok(isExpired);
+    }
+
+    @GetMapping("/latest/{userId}")
+    public ResponseEntity<SubscriptionDTO> getLatestSubscription(@PathVariable Long userId) {
+        Optional<Subscription> subscriptionOpt = subscriptionRepository.findLatestSubscription(userId);
+        if (subscriptionOpt.isPresent()) {
+            Subscription subscription = subscriptionOpt.get();
+            SubscriptionDTO subscriptionDTO = new SubscriptionDTO(
+                    subscription.getId(),
+                    subscription.getUserId(),
+                    subscription.getPlanType(),
+                    subscription.getStartDate(),
+                    subscription.getEndDate(),
+                    subscription.isActive(),
+                    subscription.getTotalSubscriptionDays()
+            );
+            return ResponseEntity.ok(subscriptionDTO);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 }
