@@ -202,7 +202,7 @@ public class VnPayService {
     }
 
     // Thuật toán HMAC_SHA512 để tạo băm an toàn
-    private String hmacSHA512(String key, String data) {
+    String hmacSHA512(String key, String data) {
         try {
             Mac sha512_HMAC = Mac.getInstance("HmacSHA512");
             SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(), "HmacSHA512");
@@ -215,7 +215,7 @@ public class VnPayService {
         }
     }
 
-    private String bytesToHex(byte[] bytes) {
+    String bytesToHex(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
         for (byte b : bytes) {
             sb.append(String.format("%02x", b & 0xff));
