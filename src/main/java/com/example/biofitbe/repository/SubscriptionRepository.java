@@ -11,6 +11,7 @@ import java.util.Optional;
 @Repository
 public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
     // tìm subscription đang hoạt động của một người dùng
+    @Query("SELECT s FROM Subscription s WHERE s.userId = :userId AND s.isActive = true ORDER BY s.endDate DESC")
     Optional<Subscription> findByUserIdAndIsActiveTrue(Long userId);
 
     @Query("SELECT s FROM Subscription s WHERE s.userId = :userId ORDER BY s.endDate DESC LIMIT 1")

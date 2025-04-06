@@ -17,7 +17,6 @@ import javax.crypto.spec.SecretKeySpec;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
@@ -31,6 +30,9 @@ public class MoMoService {
 
     @Autowired
     private PaymentRepository paymentRepository;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final HttpClient httpClient = HttpClient.newHttpClient();
 
     public PaymentResponse createPayment(PaymentRequest request) throws Exception {
         String orderId = moMoConfig.getPartnerCode() + System.currentTimeMillis();
@@ -78,7 +80,11 @@ public class MoMoService {
                 .build();
 
         HttpResponse<String> response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-        Map<String, Object> responseBody = objectMapper.readValue(response.body(), Map.class);
+
+        // Gọi phương thức gửi HTTP request
+        String responseBody = sendHttpRequest(jsonRequest);
+
+        Map<String, Object> responseMap = objectMapper.readValue(responseBody, Map.class);
 
         // Lưu thông tin thanh toán
         Payment payment = Payment.builder()
@@ -93,10 +99,9 @@ public class MoMoService {
         paymentRepository.save(payment);
 
         // Trả về payUrl
-        // Ưu tiên trả về deeplink, nếu không có thì dùng payUrl
-        String deeplink = (String) responseBody.get("deeplink");
+        String deeplink = (String) responseMap.get("deeplink");
         if (deeplink == null || deeplink.isEmpty()) {
-            deeplink = (String) responseBody.get("payUrl"); // Fallback
+            deeplink = (String) responseMap.get("payUrl");
             if (deeplink == null || deeplink.isEmpty()) {
                 throw new Exception("Không nhận được deeplink hoặc payUrl từ MoMo");
             }
@@ -144,7 +149,7 @@ public class MoMoService {
         });
     }
 
-    private String hmacSHA256(String key, String data) throws Exception {
+    String hmacSHA256(String key, String data) throws Exception {
         Mac mac = Mac.getInstance("HmacSHA256");
         SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
         mac.init(secretKeySpec);
@@ -152,7 +157,7 @@ public class MoMoService {
         return bytesToHex(rawHmac);
     }
 
-    private String bytesToHex(byte[] bytes) {
+    String bytesToHex(byte[] bytes) {
         StringBuilder result = new StringBuilder();
         for (byte b : bytes) {
             result.append(String.format("%02x", b));
@@ -160,11 +165,14 @@ public class MoMoService {
         return result.toString();
     }
 
-    private String sendHttpRequest(String url, String jsonRequest) throws Exception {
-        org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
-        org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
-        headers.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
-        org.springframework.http.HttpEntity<String> entity = new org.springframework.http.HttpEntity<>(jsonRequest, headers);
-        return restTemplate.postForObject(url, entity, String.class);
+    // Phương thức mới để gửi HTTP request
+    String sendHttpRequest(String jsonRequest) throws Exception {
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(URI.create(moMoConfig.getApiEndpoint()))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonRequest))
+                .build();
+        HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+        return response.body();
     }
 }

@@ -9,7 +9,7 @@ version = '0.0.1-SNAPSHOT'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(23)
     }
 }
 
@@ -35,8 +35,22 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation'com.fasterxml.jackson.core:jackson-databind'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+
+    // Test UnitTest Mockito
+    testImplementation 'org.mockito:mockito-core'
+
+    // JUnit 5
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+
+    // Mockito JUnit 5 integration
+    testImplementation 'org.mockito:mockito-junit-jupiter:4.11.0'
 }
 
 tasks.named('test') {
+    useJUnitPlatform()
+}
+
+test {
+    jvmArgs "-javaagent:${classpath.find { it.name.contains("byte-buddy-agent") }.absolutePath}"
     useJUnitPlatform()
 }
