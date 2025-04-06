@@ -6,6 +6,7 @@ import com.example.biofitbe.model.Exercise;
 import com.example.biofitbe.model.ExerciseDetail;
 import com.example.biofitbe.model.User;
 import com.example.biofitbe.repository.ExerciseDetailRepository;
+import com.example.biofitbe.repository.ExerciseDoneRepository;
 import com.example.biofitbe.repository.ExerciseRepository;
 import com.example.biofitbe.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -28,6 +29,9 @@ public class ExerciseService {
 
     @Autowired
     private ExerciseDetailRepository exerciseDetailRepository;
+
+    @Autowired
+    private ExerciseDoneRepository exerciseDoneRepository;
 
     private final UserRepository userRepository;
 
@@ -172,10 +176,13 @@ public class ExerciseService {
         }
     }
 
+    @Transactional
     public void deleteExercise(Long exerciseId) {
         Exercise exercise = exerciseRepository.findById(exerciseId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exercise not found with ID: " + exerciseId));
 
+        exerciseDoneRepository.deleteByExerciseId(exerciseId);
+        exerciseDetailRepository.deleteDetailsByExerciseId(exerciseId);
         exerciseRepository.delete(exercise);
     }
 
@@ -186,6 +193,7 @@ public class ExerciseService {
 
         // Cập nhật tên bài tập
         exercise.setExerciseName(updatedExerciseDTO.getExerciseName());
+        exerciseRepository.save(exercise);
 
         // Tìm `ExerciseDetail` có `exerciseGoal = 0` và `intensity = 0`
         Optional<ExerciseDetail> baseDetailOpt = exerciseDetailRepository.findByExerciseAndExerciseGoalAndIntensity(exercise, 0, 0);
@@ -206,7 +214,7 @@ public class ExerciseService {
         // ✅ Cập nhật lại tất cả `ExerciseDetail` dựa trên bài tập gốc bằng công thức nhân hệ số
         List<ExerciseDetail> updatedDetails = generateExerciseDetails(new ExerciseDetailDTO(baseDetail), exercise);
 
-        // Xóa các `ExerciseDetail` cũ (trừ bài tập gốc)
+        /*// Xóa các `ExerciseDetail` cũ (trừ bài tập gốc)
         exerciseDetailRepository.deleteByExerciseAndNotBaseDetail(exercise, 0, 0);
 
         // ✅ Lưu lại toàn bộ danh sách mới (không lưu trùng bài tập gốc)
@@ -214,9 +222,31 @@ public class ExerciseService {
             if (!(detail.getExerciseGoal() == 0 && detail.getIntensity() == 0)) {
                 exerciseDetailRepository.save(detail);
             }
+        }*/
+
+        // Cập nhật tất cả `ExerciseDetail` hiện có thay vì xóa
+        for (ExerciseDetail newDetail : updatedDetails) {
+            Optional<ExerciseDetail> existingDetailOpt = exerciseDetailRepository.findByExerciseAndExerciseGoalAndIntensity(
+                    exercise, newDetail.getExerciseGoal(), newDetail.getIntensity());
+
+            if (existingDetailOpt.isPresent()) {
+                // Nếu đã tồn tại, cập nhật giá trị
+                ExerciseDetail existingDetail = existingDetailOpt.get();
+                existingDetail.setTime(newDetail.getTime());
+                existingDetail.setBurnedCalories(newDetail.getBurnedCalories());
+                exerciseDetailRepository.save(existingDetail);
+            } else {
+                // Nếu chưa tồn tại, thêm mới
+                newDetail.setExercise(exercise);
+                exerciseDetailRepository.save(newDetail);
+            }
         }
 
-        return Optional.of(new ExerciseDTO(exercise, updatedDetails));
+        // Lấy lại danh sách `ExerciseDetail` đã cập nhật để trả về
+        List<ExerciseDetail> finalDetails = exerciseDetailRepository.findAllByExercise(exercise);
+        return Optional.of(new ExerciseDTO(exercise, finalDetails));
+
+        /*return Optional.of(new ExerciseDTO(exercise, updatedDetails));*/
     }
 
 }

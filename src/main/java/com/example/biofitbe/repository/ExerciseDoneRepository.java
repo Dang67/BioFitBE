@@ -1,8 +1,10 @@
 package com.example.biofitbe.repository;
 
 import com.example.biofitbe.dto.OverviewExerciseDTO;
+import com.example.biofitbe.model.ExerciseDetail;
 import com.example.biofitbe.model.ExerciseDone;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -53,6 +55,10 @@ public interface ExerciseDoneRepository extends JpaRepository<ExerciseDone, Long
             @Param("userId") Long userId,
             @Param("today") String today
     );
+
+    @Modifying
+    @Query("DELETE FROM ExerciseDone ed WHERE ed.exerciseDetail.exercise.exerciseId = :exerciseId")
+    void deleteByExerciseId(@Param("exerciseId") Long exerciseId);
 }
 
 

@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -16,6 +17,12 @@ public interface ExerciseDetailRepository extends JpaRepository<ExerciseDetail, 
     @Modifying
     @Query("DELETE FROM ExerciseDetail ed WHERE ed.exercise = :exercise AND NOT (ed.exerciseGoal = :baseGoal AND ed.intensity = :baseIntensity)")
     void deleteByExerciseAndNotBaseDetail(@Param("exercise") Exercise exercise, @Param("baseGoal") int baseGoal, @Param("baseIntensity") int baseIntensity);
+
+    List<ExerciseDetail> findAllByExercise(Exercise exercise);
+
+    @Modifying
+    @Query("DELETE FROM ExerciseDetail ed WHERE ed.exercise.exerciseId = :exerciseId")
+    void deleteDetailsByExerciseId(@Param("exerciseId") Long exerciseId);
 
     Optional<ExerciseDetail> findByExerciseAndExerciseGoalAndIntensity(Exercise exercise, int exerciseGoal, int intensity);
 
