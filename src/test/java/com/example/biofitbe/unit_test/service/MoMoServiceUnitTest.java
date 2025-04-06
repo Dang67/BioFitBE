@@ -1,10 +1,11 @@
-package com.example.biofitbe.service;
+package com.example.biofitbe.unit_test.service;
 
 import com.example.biofitbe.config.MoMoConfig;
 import com.example.biofitbe.dto.PaymentRequest;
 import com.example.biofitbe.dto.PaymentResponse;
 import com.example.biofitbe.model.Payment;
 import com.example.biofitbe.repository.PaymentRepository;
+import com.example.biofitbe.service.MoMoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,7 +1,9 @@
-package com.example.biofitbe.repository;
+package com.example.biofitbe.integration_test.repository;
 
 import com.example.biofitbe.model.Payment;
 import com.example.biofitbe.model.Subscription;
+import com.example.biofitbe.repository.PaymentRepository;
+import com.example.biofitbe.repository.SubscriptionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,8 @@
-package com.example.biofitbe.service;
+package com.example.biofitbe.unit_test.service;
 
 import com.example.biofitbe.model.Subscription;
 import com.example.biofitbe.repository.SubscriptionRepository;
+import com.example.biofitbe.service.SubscriptionService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

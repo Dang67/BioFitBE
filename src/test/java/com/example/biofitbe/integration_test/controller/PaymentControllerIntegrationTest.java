@@ -1,4 +1,4 @@
-package com.example.biofitbe.controller;
+package com.example.biofitbe.integration_test.controller;
 
 import com.example.biofitbe.dto.PaymentRequest;
 import com.example.biofitbe.dto.PaymentResponse;

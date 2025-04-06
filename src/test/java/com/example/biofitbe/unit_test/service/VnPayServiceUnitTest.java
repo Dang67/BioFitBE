@@ -1,4 +1,4 @@
-package com.example.biofitbe.service;
+package com.example.biofitbe.unit_test.service;
 
 import com.example.biofitbe.config.VnPayConfig;
 import com.example.biofitbe.dto.PaymentRequest;
@@ -7,6 +7,7 @@ import com.example.biofitbe.model.Payment;
 import com.example.biofitbe.model.User;
 import com.example.biofitbe.repository.PaymentRepository;
 import com.example.biofitbe.repository.UserRepository;
+import com.example.biofitbe.service.VnPayService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

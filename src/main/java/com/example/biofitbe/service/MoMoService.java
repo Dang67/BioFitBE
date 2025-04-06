@@ -149,7 +149,7 @@ public class MoMoService {
         });
     }
 
-    String hmacSHA256(String key, String data) throws Exception {
+    public String hmacSHA256(String key, String data) throws Exception {
         Mac mac = Mac.getInstance("HmacSHA256");
         SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
         mac.init(secretKeySpec);
@@ -166,7 +166,7 @@ public class MoMoService {
     }
 
     // Phương thức mới để gửi HTTP request
-    String sendHttpRequest(String jsonRequest) throws Exception {
+    public String sendHttpRequest(String jsonRequest) throws Exception {
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(URI.create(moMoConfig.getApiEndpoint()))
                 .header("Content-Type", "application/json")
