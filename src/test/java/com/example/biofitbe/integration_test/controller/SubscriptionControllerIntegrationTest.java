@@ -2,6 +2,7 @@ package com.example.biofitbe.integration_test.controller;
 
 import com.example.biofitbe.model.Subscription;
 import com.example.biofitbe.repository.SubscriptionRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,11 @@ public class SubscriptionControllerIntegrationTest {
         subscription.setActive(true);
 
         subscriptionRepository.save(subscription);
+    }
+
+    @AfterEach
+    void tearDown() {
+        subscriptionRepository.deleteAll();
     }
 
     @Test

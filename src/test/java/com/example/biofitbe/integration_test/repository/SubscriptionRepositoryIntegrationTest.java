@@ -4,6 +4,7 @@ import com.example.biofitbe.model.Payment;
 import com.example.biofitbe.model.Subscription;
 import com.example.biofitbe.repository.PaymentRepository;
 import com.example.biofitbe.repository.SubscriptionRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,12 @@ public class SubscriptionRepositoryIntegrationTest {
 
     @BeforeEach
     void setup() {
+        subscriptionRepository.deleteAll();
+        paymentRepository.deleteAll();
+    }
+
+    @AfterEach
+    void tearDown() {
         subscriptionRepository.deleteAll();
         paymentRepository.deleteAll();
     }
