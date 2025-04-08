@@ -142,8 +142,8 @@ public class VnPayService {
             return new PaymentResponse(true, "Payment URL created successfully", paymentUrl, orderId);
 
         } catch (Exception e) {
-            e.printStackTrace();
-            return new PaymentResponse(false, "Error creating payment URL: " + e.getMessage(), null, null);
+            // luôn trả về PaymentResponse
+            return new PaymentResponse(false, e.getMessage(), null, null);
         }
     }
 

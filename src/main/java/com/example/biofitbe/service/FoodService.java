@@ -18,12 +18,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class FoodService {
     @Autowired
     private FoodRepository foodRepository;
 
-    private final UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     // Lấy danh sách Food theo userId
     public List<FoodDTO> getFoodsByUserId(Long userId) {
