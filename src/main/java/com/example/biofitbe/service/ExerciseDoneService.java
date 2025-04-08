@@ -20,7 +20,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class ExerciseDoneService {
     @Autowired
     private ExerciseDoneRepository exerciseDoneRepository;

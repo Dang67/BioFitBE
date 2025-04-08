@@ -22,7 +22,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class ExerciseService {
     @Autowired
     private ExerciseRepository exerciseRepository;
@@ -33,7 +32,8 @@ public class ExerciseService {
     @Autowired
     private ExerciseDoneRepository exerciseDoneRepository;
 
-    private final UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     public List<ExerciseDTO> getExercisesByUserId(Long userId) {
         List<Exercise> exercises = exerciseRepository.findByUserUserIdOrderByExerciseNameAsc(userId);
@@ -91,7 +91,7 @@ public class ExerciseService {
     /**
      * ✅ Hàm tự động sinh danh sách ExerciseDetail dựa trên detail đầu tiên
      */
-    private List<ExerciseDetail> generateExerciseDetails(ExerciseDetailDTO baseDetail, Exercise exercise) {
+    public List<ExerciseDetail> generateExerciseDetails(ExerciseDetailDTO baseDetail, Exercise exercise) {
         List<ExerciseDetail> details = new ArrayList<>();
 
         // Hệ số nhân để tính toán `time` và `burnedCalories`
