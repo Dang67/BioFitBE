@@ -19,6 +19,7 @@ public class FoodDone {
 
     @ManyToOne
     @JoinColumn(name = "food_id", nullable = false)
+    @JsonBackReference
     private Food food;
 
     @Column(name = "date", nullable = false)

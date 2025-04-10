@@ -25,4 +25,22 @@ public class FoodDoneController {
             return ResponseEntity.badRequest().body("Food already exists!"); // Báo lỗi nếu đã tồn tại
         }
     }
+
+    @GetMapping("/list")
+    public ResponseEntity<?> getFoodDoneByDate(@RequestParam Long userId,
+                                               @RequestParam String date) {
+        List<FoodDoneDTO> result = foodDoneService.getFoodDoneByUserAndDate(userId, date);
+        return ResponseEntity.ok(result);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteFoodDone(@PathVariable Long id) {
+        boolean deleted = foodDoneService.deleteFoodDoneById(id);
+        if (deleted) {
+            return ResponseEntity.ok("Deleted successfully!");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }

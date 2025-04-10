@@ -35,7 +35,6 @@ public class FoodService {
     public FoodDTO getFoodByIdWithDetails(Long foodId) {
         Food food = foodRepository.findById(foodId)
                 .orElseThrow(() -> new RuntimeException("Food not found"));
-
         return new FoodDTO(food); // ✅ Trả về FoodDTO mà không cần chi tiết riêng nữa
     }
 
@@ -89,11 +88,9 @@ public class FoodService {
     public Optional<FoodDTO> updateFood(Long foodId, FoodDTO updatedFoodDTO) {
         Food food = foodRepository.findById(foodId)
                 .orElseThrow(() -> new RuntimeException("Food not found"));
-
         food.setFoodName(updatedFoodDTO.getFoodName());
         food.setSession(updatedFoodDTO.getSession());
         food.setDate(updatedFoodDTO.getDate());
-
         // Lưu lại Food đã cập nhật
         foodRepository.save(food);
 
