@@ -32,7 +32,6 @@ public class FoodDTO {
         this.foodName = food.getFoodName();
         this.date = food.getDate();
         this.session = food.getSession();
-        this.foodImage = food.getFoodImage();
         this.servingSize = food.getServingSize();
         this.servingSizeUnit = food.getServingSizeUnit();
         this.mass = food.getMass();

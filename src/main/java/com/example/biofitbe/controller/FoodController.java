@@ -25,11 +25,6 @@ public class FoodController {
         return ResponseEntity.ok(foods);
     }
 
-    @GetMapping("/{foodId}/details")
-    public ResponseEntity<FoodDTO> getFoodWithDetails(@PathVariable Long foodId) {
-        return ResponseEntity.ok(foodService.getFoodByIdWithDetails(foodId));
-    }
-
     @PostMapping("/create")
     public ResponseEntity<?> createFood(@RequestBody FoodDTO foodDTO) {
         Optional<FoodDTO> createdFood = foodService.createFood(foodDTO);
@@ -61,5 +56,4 @@ public class FoodController {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
-
 }
