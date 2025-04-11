@@ -14,11 +14,15 @@ public interface FoodDoneRepository extends JpaRepository<FoodDone, Long> {
 
     boolean existsByFoodAndDateAndSession(Food food, String date, String session);
 
+    void deleteByFood(Food food);
+
     @Query("SELECT fd FROM FoodDone fd " +
             "WHERE fd.food.user.userId = :userId " +
             "AND fd.date = :date")
     List<FoodDone> findByUserIdAndDate(@Param("userId") Long userId,
                                        @Param("date") String date);
+
+
 
 //    @Query("SELECT SUM(f.consumeCalories) " +
 //            "FROM FoodDone fd " +

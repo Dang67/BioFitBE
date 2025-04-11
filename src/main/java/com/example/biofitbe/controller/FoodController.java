@@ -61,12 +61,13 @@ public class FoodController {
     @DeleteMapping("/{foodId}")
     public ResponseEntity<?> deleteFood(@PathVariable Long foodId) {
         try {
-            foodService.deleteFood(foodId);
-            return ResponseEntity.ok().body("Food deleted successfully");
+            foodService.deleteFood(foodId); // Xử lý xóa cả foodDone trong service
+            return ResponseEntity.ok("Food and related records deleted successfully");
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting food");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Unexpected error while deleting food");
         }
     }
 

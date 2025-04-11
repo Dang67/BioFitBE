@@ -3,6 +3,7 @@ package com.example.biofitbe.service;
 import com.example.biofitbe.dto.FoodDTO;
 import com.example.biofitbe.model.Food;
 import com.example.biofitbe.model.User;
+import com.example.biofitbe.repository.FoodDoneRepository;
 import com.example.biofitbe.repository.FoodRepository;
 import com.example.biofitbe.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -26,6 +27,10 @@ public class FoodService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private FoodDoneRepository foodDoneRepository;
+
 
     // Lấy danh sách Food theo userId
     public List<FoodDTO> getFoodsByUserId(Long userId) {
@@ -79,10 +84,16 @@ public class FoodService {
         return Optional.of(createdFoodDTO);
     }
 
-
+    @Transactional
     public void deleteFood(Long foodId) {
         Food food = foodRepository.findById(foodId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Food not found with ID: " + foodId));
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Food not found with ID: " + foodId));
+
+        // ✅ Xóa tất cả FoodDone liên quan
+        foodDoneRepository.deleteByFood(food);
+
+        // ✅ Sau đó xóa Food
         foodRepository.delete(food);
     }
 
