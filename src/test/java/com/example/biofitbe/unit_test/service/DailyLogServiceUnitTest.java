@@ -30,18 +30,14 @@ public class DailyLogServiceUnitTest {
     @InjectMocks
     private DailyLogService dailyLogService;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
-
     @Test
     void testFindDailyLogByUserIdAndDate() {
         Long userId = 1L;
         String date = "2024-04-07";
 
         DailyLog dailyLog = new DailyLog();
-        when(dailyLogRepository.findByUserUserIdAndDate(userId, date)).thenReturn(Optional.of(dailyLog));
+        when(dailyLogRepository.findByUserUserIdAndDate(eq(userId), eq(date)))
+                .thenReturn(Optional.of(dailyLog));
 
         Optional<DailyLog> result = dailyLogService.findDailyLogByUserIdAndDate(userId, date);
         assertTrue(result.isPresent());
@@ -127,7 +123,7 @@ public class DailyLogServiceUnitTest {
         );
 
         when(dailyLogRepository.findAllByUserIdOrdered(userId)).thenReturn(logs);
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        lenient().when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         List<DailyLogDTO> result = dailyLogService.getWeightHistory(userId);
 

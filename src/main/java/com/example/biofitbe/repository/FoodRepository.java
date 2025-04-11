@@ -14,11 +14,9 @@ public interface FoodRepository extends JpaRepository<Food, Long> {
 
     // Các phương thức truy vấn cho Food
     Optional<Food> findByUserUserIdAndFoodName(Long userId, String foodName);
-
     List<Food> findByUserUserIdOrderByFoodNameAsc(Long userId);
 
     // Truy vấn lấy Food với tất cả thông tin liên quan
     @Query("SELECT f FROM Food f WHERE f.foodId = :foodId")
     Optional<Food> findById(@Param("foodId") Long foodId);
-
 }
