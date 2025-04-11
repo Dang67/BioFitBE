@@ -34,8 +34,9 @@ public class Food {
     @Column(name = "session", nullable = false)
     private String session;
 
-    @Column(name = "food_image", nullable = false)
-    private String foodImage;
+    @Lob
+    @Column(name = "food_image", columnDefinition = "LONGBLOB")
+    private byte[] foodImage;
 
     @Column(name = "serving_size", nullable = false)
     private Float servingSize;

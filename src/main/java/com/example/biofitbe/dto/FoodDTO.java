@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Arrays;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -16,7 +18,7 @@ public class FoodDTO {
     private String foodName;
     private String date;
     private String session;
-    private String foodImage;
+    private byte[] foodImage;
     private Float servingSize;
     private String servingSizeUnit;
     private Float mass;
@@ -32,6 +34,7 @@ public class FoodDTO {
         this.foodName = food.getFoodName();
         this.date = food.getDate();
         this.session = food.getSession();
+        this.foodImage = food.getFoodImage();
         this.servingSize = food.getServingSize();
         this.servingSizeUnit = food.getServingSizeUnit();
         this.mass = food.getMass();

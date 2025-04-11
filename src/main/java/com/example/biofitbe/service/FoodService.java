@@ -10,8 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -42,37 +44,37 @@ public class FoodService {
     public Optional<FoodDTO> createFood(FoodDTO foodDTO) {
         // Kiểm tra xem thực phẩm đã tồn tại chưa
         if (foodRepository.findByUserUserIdAndFoodName(foodDTO.getUserId(), foodDTO.getFoodName()).isPresent()) {
-            return Optional.empty(); // Nếu đã có, trả về Optional rỗng
+            return Optional.empty();
         }
 
         // Tìm kiếm User
         Optional<User> userOpt = userRepository.findById(foodDTO.getUserId());
         if (userOpt.isEmpty()) {
-            return Optional.empty(); // Nếu không có User, trả về lỗi
+            return Optional.empty();
         }
         User user = userOpt.get();
 
-        // ✅ Tạo mới Food
+        // Tạo mới Food
         Food food = Food.builder()
-                .user(user) // Gán user từ foodDTO
-                .foodName(foodDTO.getFoodName()) // Gán tên thực phẩm từ foodDTO
-                .session(foodDTO.getSession()) // Gán session từ foodDTO
-                .date(foodDTO.getDate()) // Gán ngày từ foodDTO
-                .foodImage(foodDTO.getFoodImage()) // Gán foodImage từ foodDTO
-                .servingSize(foodDTO.getServingSize()) // Gán servingSizeValue từ foodDTO
-                .servingSizeUnit(foodDTO.getServingSizeUnit()) // Gán servingSizeUnit từ foodDTO
-                .mass(foodDTO.getMass()) // Gán mass từ foodDTO
-                .calories(foodDTO.getCalories()) // Gán calories từ foodDTO
-                .protein(foodDTO.getProtein()) // Gán proteinValue từ foodDTO
-                .carbohydrate(foodDTO.getCarbohydrate()) // Gán carbohydrateValue từ foodDTO
-                .fat(foodDTO.getFat()) // Gán fatValue từ foodDTO
-                .sodium(foodDTO.getSodium()) // Gán sodium từ foodDTO (nếu có)
+                .user(user)
+                .foodName(foodDTO.getFoodName())
+                .session(foodDTO.getSession())
+                .date(foodDTO.getDate())
+                .foodImage(foodDTO.getFoodImage()) // Sử dụng trực tiếp byte[], có thể là null
+                .servingSize(foodDTO.getServingSize())
+                .servingSizeUnit(foodDTO.getServingSizeUnit())
+                .mass(foodDTO.getMass())
+                .calories(foodDTO.getCalories())
+                .protein(foodDTO.getProtein())
+                .carbohydrate(foodDTO.getCarbohydrate())
+                .fat(foodDTO.getFat())
+                .sodium(foodDTO.getSodium())
                 .build();
 
         // Lưu Food vào cơ sở dữ liệu
         food = foodRepository.save(food);
 
-        // Trả về FoodDTO sau khi lưu thành công
+        // Trả về FoodDTO
         FoodDTO createdFoodDTO = new FoodDTO(food);
         return Optional.of(createdFoodDTO);
     }
@@ -85,15 +87,30 @@ public class FoodService {
     }
 
     @Transactional
-    public Optional<FoodDTO> updateFood(Long foodId, FoodDTO updatedFoodDTO) {
-        Food food = foodRepository.findById(foodId)
-                .orElseThrow(() -> new RuntimeException("Food not found"));
-        food.setFoodName(updatedFoodDTO.getFoodName());
-        food.setSession(updatedFoodDTO.getSession());
-        food.setDate(updatedFoodDTO.getDate());
-        // Lưu lại Food đã cập nhật
-        foodRepository.save(food);
+    public Optional<FoodDTO> updateFood(FoodDTO foodDTO) {
+        Optional<Food> foodOpt = foodRepository.findById(foodDTO.getFoodId());
+        if (foodOpt.isEmpty()) {
+            return Optional.empty();
+        }
+        Food food = foodOpt.get();
 
+        // Cập nhật các trường
+        food.setFoodName(foodDTO.getFoodName());
+        food.setSession(foodDTO.getSession());
+        food.setDate(foodDTO.getDate());
+        if (foodDTO.getFoodImage() != null) {
+            food.setFoodImage(foodDTO.getFoodImage());
+        }
+        food.setServingSize(foodDTO.getServingSize());
+        food.setServingSizeUnit(foodDTO.getServingSizeUnit());
+        food.setMass(foodDTO.getMass());
+        food.setCalories(foodDTO.getCalories());
+        food.setProtein(foodDTO.getProtein());
+        food.setCarbohydrate(foodDTO.getCarbohydrate());
+        food.setFat(foodDTO.getFat());
+        food.setSodium(foodDTO.getSodium());
+
+        foodRepository.save(food);
         return Optional.of(new FoodDTO(food));
     }
 }
