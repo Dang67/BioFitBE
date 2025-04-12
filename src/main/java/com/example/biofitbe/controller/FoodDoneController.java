@@ -1,6 +1,7 @@
 package com.example.biofitbe.controller;
 
 import com.example.biofitbe.dto.FoodDoneDTO;
+import com.example.biofitbe.dto.FoodSummaryDTO;
 import com.example.biofitbe.service.FoodDoneService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -42,5 +43,10 @@ public class FoodDoneController {
             return ResponseEntity.notFound().build();
         }
     }
-
+    @GetMapping("/summary")
+    public ResponseEntity<?> getFoodSummary(@RequestParam Long userId,
+                                            @RequestParam String date) {
+        FoodSummaryDTO summary = foodDoneService.getFoodSummaryByUserAndDate(userId, date);
+        return ResponseEntity.ok(summary);
+    }
 }
