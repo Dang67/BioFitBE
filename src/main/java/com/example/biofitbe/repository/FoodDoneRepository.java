@@ -23,13 +23,4 @@ public interface FoodDoneRepository extends JpaRepository<FoodDone, Long> {
                                        @Param("date") String date);
 
 
-
-//    @Query("SELECT SUM(f.consumeCalories) " +
-//            "FROM FoodDone fd " +
-//            "JOIN fd.food f " +
-//            "WHERE f.user.userId = :userId " +
-//            "AND fd.date = :date")
-//    Float getTotalCaloriesByUserAndDate(@Param("userId") Long userId,
-//                                        @Param("date") String date);
-
 }
