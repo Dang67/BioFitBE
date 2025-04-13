@@ -1,6 +1,7 @@
 package com.example.biofitbe.service;
 
 import com.example.biofitbe.dto.FoodDoneDTO;
+import com.example.biofitbe.dto.FoodSummaryDTO;
 import com.example.biofitbe.model.Food;
 import com.example.biofitbe.model.FoodDone;
 import com.example.biofitbe.repository.FoodDoneRepository;
@@ -89,6 +90,26 @@ public class FoodDoneService {
             return true;
         }
         return false;
+    }
+    public FoodSummaryDTO getFoodSummaryByUserAndDate(Long userId, String date) {
+        List<FoodDone> foodDoneList = foodDoneRepository.findByUserIdAndDate(userId, date);
+
+        double totalCalories = 0.0;
+        double totalProtein = 0.0;
+        double totalCarb = 0.0;
+        double totalFat = 0.0;
+
+        for (FoodDone foodDone : foodDoneList) {
+            Food food = foodDone.getFood();
+            if (food != null) {
+                totalCalories += food.getCalories();
+                totalProtein += food.getProtein();
+                totalCarb += food.getCarbohydrate();
+                totalFat += food.getFat();
+            }
+        }
+
+        return new FoodSummaryDTO(totalCalories, totalProtein, totalCarb, totalFat);
     }
 
 }
