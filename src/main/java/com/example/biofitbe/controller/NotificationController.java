@@ -49,4 +49,16 @@ public class NotificationController {
         Notification welcomeNotification = notificationService.createWelcomeNotification(userId);
         return ResponseEntity.ok(NotificationDTO.fromEntity(welcomeNotification));
     }
+
+    @PostMapping("/mark-all-read/{userId}")
+    public ResponseEntity<Void> markAllAsRead(@PathVariable String userId) {
+        notificationService.markAllAsRead(userId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/delete-all/{userId}")
+    public ResponseEntity<Void> deleteAllNotifications(@PathVariable String userId) {
+        notificationService.deleteAllNotifications(userId);
+        return ResponseEntity.ok().build();
+    }
 }

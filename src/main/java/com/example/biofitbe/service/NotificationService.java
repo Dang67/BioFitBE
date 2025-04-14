@@ -5,7 +5,7 @@ import com.example.biofitbe.dto.NotificationRequest;
 import com.example.biofitbe.model.Notification;
 import com.example.biofitbe.repository.NotificationRepository;
 import com.example.biofitbe.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -15,43 +15,27 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class NotificationService {
 
-    private void scheduleSleepNotification(String userId) {
-        LocalDateTime today = LocalDateTime.now().with(LocalTime.of(22, 0));
+    @Autowired
+    private NotificationRepository notificationRepository;
 
-        // Thông báo chính
-        Notification notification = Notification.builder()
-                .userId(userId)
-                .title("Đã đến giờ đi ngủ rôi 🍳")
-                .message("Đi ngủ để mai có một năng lượng dồi dào cho ngày mới nhé!")
-                .mealType(Notification.MealType.BREAKFAST)
-                .scheduledTime(today)
-                .createdAt(LocalDateTime.now())
-                .isRead(false)
-                .isReminderSent(false)
-                .build();
+    @Autowired
+    private UserRepository userRepository;
 
-        notificationRepository.save(notification);
-
-        // Thông báo nhắc nhở sau 5 phút
-        Notification reminder = Notification.builder()
-                .userId(userId)
-                .title("Nhắc nhở ăn sáng 🥞")
-                .message("Đừng quên ăn sáng để có năng lượng cho buổi sáng nhé!")
-                .mealType(Notification.MealType.BREAKFAST)
-                .scheduledTime(today.plusMinutes(5))
-                .createdAt(LocalDateTime.now())
-                .isRead(false)
-                .isReminderSent(false)
-                .build();
-
-        notificationRepository.save(reminder);
+    // hàm kiểm tra xem thời gian target
+    private LocalDateTime getNextValidTime(int hour, int minute) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime target = now.with(LocalTime.of(hour, minute));
+        if (target.isBefore(now)) {
+            target = target.plusDays(1); // Đã qua -> chuyển sang ngày mai
+        }
+        return target;
     }
 
     private void scheduleBreakfastNotifications(String userId) {
-        LocalDateTime today = LocalDateTime.now().with(LocalTime.of(7, 0));
+        LocalDateTime today = getNextValidTime(7, 0);
+        System.out.println("Scheduled time: " + today);
 
         // Thông báo chính
         Notification notification = Notification.builder()
@@ -83,7 +67,8 @@ public class NotificationService {
     }
 
     private void scheduleLunchNotifications(String userId) {
-        LocalDateTime today = LocalDateTime.now().with(LocalTime.of(12, 0));
+        LocalDateTime today = getNextValidTime(12, 0);
+        System.out.println("Scheduled time: " + today);
 
         // Thông báo chính
         Notification notification = Notification.builder()
@@ -105,7 +90,7 @@ public class NotificationService {
                 .title("Nhắc nhở ăn trưa 🥗")
                 .message("Đừng bỏ bữa trưa! Hãy nạp năng lượng để hoàn thành tốt công việc buổi chiều.")
                 .mealType(Notification.MealType.LUNCH)
-                .scheduledTime(today.plusMinutes(10))
+                .scheduledTime(today.plusMinutes(5))
                 .createdAt(LocalDateTime.now())
                 .isRead(false)
                 .isReminderSent(false)
@@ -115,7 +100,8 @@ public class NotificationService {
     }
 
     private void scheduleDinnerNotifications(String userId) {
-        LocalDateTime today = LocalDateTime.now().with(LocalTime.of(18, 30));
+        LocalDateTime today = getNextValidTime(18, 0);
+        System.out.println("Scheduled time: " + today);
 
         // Thông báo chính
         Notification notification = Notification.builder()
@@ -137,7 +123,7 @@ public class NotificationService {
                 .title("Nhắc nhở ăn tối 🍚")
                 .message("Đừng quên ăn tối đầy đủ dinh dưỡng để kết thúc ngày một cách lành mạnh.")
                 .mealType(Notification.MealType.DINNER)
-                .scheduledTime(today.plusMinutes(10))
+                .scheduledTime(today.plusMinutes(5))
                 .createdAt(LocalDateTime.now())
                 .isRead(false)
                 .isReminderSent(false)
@@ -148,7 +134,8 @@ public class NotificationService {
 
     private void scheduleSnackNotifications(String userId) {
         // Snack buổi sáng
-        LocalDateTime morningSnack = LocalDateTime.now().with(LocalTime.of(10, 0));
+        LocalDateTime morningSnack = getNextValidTime(10, 0);
+        System.out.println("Scheduled time: " + morningSnack);
         Notification morningSnackNotification = Notification.builder()
                 .userId(userId)
                 .title("Giờ ăn nhẹ buổi sáng 🍎")
@@ -163,7 +150,9 @@ public class NotificationService {
         notificationRepository.save(morningSnackNotification);
 
         // Snack buổi chiều
-        LocalDateTime afternoonSnack = LocalDateTime.now().with(LocalTime.of(15, 0));
+        LocalDateTime afternoonSnack = getNextValidTime(14, 0);
+        System.out.println("Scheduled time: " + morningSnack);
+
         Notification afternoonSnackNotification = Notification.builder()
                 .userId(userId)
                 .title("Giờ ăn nhẹ buổi chiều 🥜")
@@ -178,11 +167,38 @@ public class NotificationService {
         notificationRepository.save(afternoonSnackNotification);
     }
 
-    @Autowired
-    private NotificationRepository notificationRepository;
+    private void scheduleSleepNotification(String userId) {
+        LocalDateTime today = getNextValidTime(22, 0);
+        System.out.println("Scheduled time: " + today);
 
-    @Autowired
-    private UserRepository userRepository;
+        // Thông báo chính
+        Notification notification = Notification.builder()
+                .userId(userId)
+                .title("Đã đến giờ đi ngủ rôi 😴")
+                .message("Đi ngủ để mai có một năng lượng dồi dào cho ngày mới nhé!")
+                .mealType(Notification.MealType.SLEEP)
+                .scheduledTime(today)
+                .createdAt(LocalDateTime.now())
+                .isRead(false)
+                .isReminderSent(false)
+                .build();
+
+        notificationRepository.save(notification);
+
+        // Thông báo nhắc nhở sau 5 phút
+        Notification reminder = Notification.builder()
+                .userId(userId)
+                .title("Nhắc nhở đi ngủ 😴")
+                .message("Đừng quên đi ngủ để có năng lượng cho buổi sáng nhé!")
+                .mealType(Notification.MealType.SLEEP)
+                .scheduledTime(today.plusMinutes(5))
+                .createdAt(LocalDateTime.now())
+                .isRead(false)
+                .isReminderSent(false)
+                .build();
+
+        notificationRepository.save(reminder);
+    }
 
     public List<NotificationDTO> getUserNotifications(String userId) {
         return notificationRepository.findByUserIdOrderByScheduledTimeDesc(userId)
@@ -219,12 +235,14 @@ public class NotificationService {
         return notificationRepository.save(notification);
     }
 
-    @Scheduled(cron = "0 0 7,12,18,22 * * ?") // 7h, 12h, 18h, 21h hàng ngày
+    @Scheduled(cron = "0 0 1,7,10,12,14,18,22 * * ?")
+    @Transactional
     public void sendScheduledMealNotifications() {
         LocalDateTime now = LocalDateTime.now();
+        System.out.println("Running scheduled notifications at " + LocalDateTime.now());
 
         // Lấy tất cả user cần nhận thông báo
-        List<Long> allUserIds = userRepository.findAllUserIds(); // Giả sử có repository này
+        List<Long> allUserIds = userRepository.findAllUserIds();
 
         allUserIds.forEach(userId -> {
             if (now.getHour() == 7) {
@@ -233,24 +251,41 @@ public class NotificationService {
                 scheduleLunchNotifications(String.valueOf(userId));
             } else if (now.getHour() == 18) {
                 scheduleDinnerNotifications(String.valueOf(userId));
+            } else if (now.getHour() == 10 || now.getHour() == 14) {
+                scheduleSnackNotifications(String.valueOf(userId));
             } else if (now.getHour() == 22) {
                 scheduleSleepNotification(String.valueOf(userId));
+            }   else if (now.getHour() == 1) {
+                createWelcomeNotification(String.valueOf(userId));
             }
         });
     }
 
     public Notification createWelcomeNotification(String userId) {
+        LocalDateTime now = LocalDateTime.now();
+
         Notification notification = Notification.builder()
                 .userId(userId)
                 .title("Chào mừng đến với BioFit!")
-                .message("Cảm ơn bạn đã sử dụng ứng dụng. Hãy bắt đầu hành trình sức khỏe của bạn!")
+                .message("Cảm ơn bạn đã sử dụng ứng dụng. Hãy bắt đầu hành trình sức khỏe với ngày mới của bạn!")
                 .mealType(Notification.MealType.OTHER)
-                .scheduledTime(LocalDateTime.now())
-                .createdAt(LocalDateTime.now())
+                .scheduledTime(now)
+                .createdAt(now)
                 .isRead(false)
                 .isReminderSent(false)
                 .build();
 
         return notificationRepository.save(notification);
     }
+
+    @Transactional
+    public void markAllAsRead(String userId) {
+        notificationRepository.markAllAsReadByUserId(userId);
+    }
+
+    @Transactional
+    public void deleteAllNotifications(String userId) {
+        notificationRepository.deleteByUserId(userId);
+    }
+
 }

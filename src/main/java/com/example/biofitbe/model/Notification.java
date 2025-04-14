@@ -25,7 +25,9 @@ public class Notification {
 
     private String message;
 
+    // ALTER TABLE notification MODIFY meal_type ENUM('BREAKFAST', 'LUNCH', 'DINNER', 'SNACK', 'OTHER'); trong SQL
     @Enumerated(EnumType.STRING)
+    @Column(length = 50)
     private MealType mealType;
 
     private LocalDateTime scheduledTime;
@@ -37,7 +39,7 @@ public class Notification {
     private boolean isReminderSent;
 
     public enum MealType {
-        BREAKFAST, LUNCH, DINNER, SNACK, OTHER;
+        BREAKFAST, LUNCH, DINNER, SNACK, SLEEP, OTHER;
     }
 }
 
