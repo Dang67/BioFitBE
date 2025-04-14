@@ -133,38 +133,44 @@ public class NotificationService {
     }
 
     private void scheduleSnackNotifications(String userId) {
-        // Snack buổi sáng
-        LocalDateTime morningSnack = getNextValidTime(10, 0);
-        System.out.println("Scheduled time: " + morningSnack);
-        Notification morningSnackNotification = Notification.builder()
-                .userId(userId)
-                .title("Giờ ăn nhẹ buổi sáng 🍎")
-                .message("Một chút hoa quả hoặc hạt sẽ giúp bạn duy trì năng lượng đến bữa trưa!")
-                .mealType(Notification.MealType.SNACK)
-                .scheduledTime(morningSnack)
-                .createdAt(LocalDateTime.now())
-                .isRead(false)
-                .isReminderSent(false)
-                .build();
+        LocalDateTime now = LocalDateTime.now();
 
-        notificationRepository.save(morningSnackNotification);
+        // Nếu là 10h sáng - Snack buổi sáng
+        if (now.getHour() == 10) {
+            LocalDateTime morningSnack = getNextValidTime(10, 0);
+            System.out.println("Scheduled morning snack time: " + morningSnack);
 
-        // Snack buổi chiều
-        LocalDateTime afternoonSnack = getNextValidTime(14, 0);
-        System.out.println("Scheduled time: " + morningSnack);
+            Notification morningSnackNotification = Notification.builder()
+                    .userId(userId)
+                    .title("Giờ ăn nhẹ buổi sáng 🍎")
+                    .message("Một chút hoa quả hoặc hạt sẽ giúp bạn duy trì năng lượng đến bữa trưa!")
+                    .mealType(Notification.MealType.SNACK)
+                    .scheduledTime(morningSnack)
+                    .createdAt(LocalDateTime.now())
+                    .isRead(false)
+                    .isReminderSent(false)
+                    .build();
 
-        Notification afternoonSnackNotification = Notification.builder()
-                .userId(userId)
-                .title("Giờ ăn nhẹ buổi chiều 🥜")
-                .message("Hãy nạp chút năng lượng để hoàn thành tốt công việc cuối ngày!")
-                .mealType(Notification.MealType.SNACK)
-                .scheduledTime(afternoonSnack)
-                .createdAt(LocalDateTime.now())
-                .isRead(false)
-                .isReminderSent(false)
-                .build();
+            notificationRepository.save(morningSnackNotification);
+        }
+        // Nếu là 14h chiều - Snack buổi chiều
+        else if (now.getHour() == 14) {
+            LocalDateTime afternoonSnack = getNextValidTime(14, 0);
+            System.out.println("Scheduled afternoon snack time: " + afternoonSnack);
 
-        notificationRepository.save(afternoonSnackNotification);
+            Notification afternoonSnackNotification = Notification.builder()
+                    .userId(userId)
+                    .title("Giờ ăn nhẹ buổi chiều 🥜")
+                    .message("Hãy nạp chút năng lượng để hoàn thành tốt công việc cuối ngày!")
+                    .mealType(Notification.MealType.SNACK)
+                    .scheduledTime(afternoonSnack)
+                    .createdAt(LocalDateTime.now())
+                    .isRead(false)
+                    .isReminderSent(false)
+                    .build();
+
+            notificationRepository.save(afternoonSnackNotification);
+        }
     }
 
     private void scheduleSleepNotification(String userId) {
