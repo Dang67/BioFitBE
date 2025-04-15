@@ -38,6 +38,8 @@ public class Notification {
 
     private boolean isReminderSent;
 
+    private int priority;
+
     public enum MealType {
         BREAKFAST, LUNCH, DINNER, SNACK, SLEEP, OTHER;
     }

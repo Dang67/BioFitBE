@@ -13,7 +13,7 @@ import java.util.List;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
-    List<Notification> findByUserIdOrderByScheduledTimeDesc(String userId);
+    List<Notification> findByUserIdOrderByPriorityDescScheduledTimeDesc(String userId);
 
     @Transactional
     void deleteByUserId(String userId);
@@ -26,5 +26,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     long countByUserIdAndMealTypeAndDate(@Param("userId") String userId,
                                          @Param("mealType") Notification.MealType mealType,
                                          @Param("date") LocalDateTime date);
+
 
 }

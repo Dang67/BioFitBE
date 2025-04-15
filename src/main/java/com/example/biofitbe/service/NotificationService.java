@@ -46,6 +46,7 @@ public class NotificationService {
                 .scheduledTime(today)
                 .createdAt(LocalDateTime.now())
                 .isRead(false)
+                .priority(0)
                 .isReminderSent(false)
                 .build();
 
@@ -60,6 +61,7 @@ public class NotificationService {
                 .scheduledTime(today.plusMinutes(5))
                 .createdAt(LocalDateTime.now())
                 .isRead(false)
+                .priority(0)
                 .isReminderSent(false)
                 .build();
 
@@ -79,6 +81,7 @@ public class NotificationService {
                 .scheduledTime(today)
                 .createdAt(LocalDateTime.now())
                 .isRead(false)
+                .priority(0)
                 .isReminderSent(false)
                 .build();
 
@@ -93,6 +96,7 @@ public class NotificationService {
                 .scheduledTime(today.plusMinutes(5))
                 .createdAt(LocalDateTime.now())
                 .isRead(false)
+                .priority(0)
                 .isReminderSent(false)
                 .build();
 
@@ -112,6 +116,7 @@ public class NotificationService {
                 .scheduledTime(today)
                 .createdAt(LocalDateTime.now())
                 .isRead(false)
+                .priority(0)
                 .isReminderSent(false)
                 .build();
 
@@ -126,6 +131,7 @@ public class NotificationService {
                 .scheduledTime(today.plusMinutes(5))
                 .createdAt(LocalDateTime.now())
                 .isRead(false)
+                .priority(0)
                 .isReminderSent(false)
                 .build();
 
@@ -148,6 +154,7 @@ public class NotificationService {
                     .scheduledTime(morningSnack)
                     .createdAt(LocalDateTime.now())
                     .isRead(false)
+                    .priority(0)
                     .isReminderSent(false)
                     .build();
 
@@ -166,6 +173,7 @@ public class NotificationService {
                     .scheduledTime(afternoonSnack)
                     .createdAt(LocalDateTime.now())
                     .isRead(false)
+                    .priority(0)
                     .isReminderSent(false)
                     .build();
 
@@ -186,6 +194,7 @@ public class NotificationService {
                 .scheduledTime(today)
                 .createdAt(LocalDateTime.now())
                 .isRead(false)
+                .priority(0)
                 .isReminderSent(false)
                 .build();
 
@@ -200,6 +209,7 @@ public class NotificationService {
                 .scheduledTime(today.plusMinutes(5))
                 .createdAt(LocalDateTime.now())
                 .isRead(false)
+                .priority(0)
                 .isReminderSent(false)
                 .build();
 
@@ -207,7 +217,7 @@ public class NotificationService {
     }
 
     public List<NotificationDTO> getUserNotifications(String userId) {
-        return notificationRepository.findByUserIdOrderByScheduledTimeDesc(userId)
+        return notificationRepository.findByUserIdOrderByPriorityDescScheduledTimeDesc(userId)
                 .stream()
                 .map(NotificationDTO::fromEntity)
                 .collect(Collectors.toList());
@@ -278,7 +288,8 @@ public class NotificationService {
                 .scheduledTime(now)
                 .createdAt(now)
                 .isRead(false)
-                .isReminderSent(false)
+                .priority(1)
+                .isReminderSent(false)  
                 .build();
 
         return notificationRepository.save(notification);
