@@ -26,6 +26,9 @@ public class UserService {
     @Autowired
     private ExerciseService exerciseService;
 
+    @Autowired
+    private FoodService foodService;
+
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
@@ -60,6 +63,9 @@ public class UserService {
 
         // Khởi tạo các bài tập mặc định sau khi tạo user thành công
         exerciseService.initializeDefaultExercises(savedUser.getUserId());
+        // Khởi tạo thức ăn mặc định
+        foodService.initializeDefaultFoods(savedUser.getUserId());
+
         return Optional.of(UserDTO.fromEntity(savedUser));
     }
 
@@ -232,4 +238,5 @@ public class UserService {
                 .message("User with this email not found.")
                 .build();
     }
+
 }
