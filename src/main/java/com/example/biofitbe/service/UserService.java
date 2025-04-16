@@ -64,7 +64,7 @@ public class UserService {
         // Khởi tạo các bài tập mặc định sau khi tạo user thành công
         exerciseService.initializeDefaultExercises(savedUser.getUserId());
         // Khởi tạo thức ăn mặc định
-        foodService.initializeDefaultFoods(savedUser.getUserId());
+        /*foodService.initializeDefaultFoods(savedUser.getUserId());*/
 
         return Optional.of(UserDTO.fromEntity(savedUser));
     }

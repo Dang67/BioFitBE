@@ -125,7 +125,7 @@ public class FoodService {
         return Optional.of(new FoodDTO(food));
     }
 
-    @Transactional
+    /*@Transactional
     public void initializeDefaultFoods(Long userId) {
         if (foodRepository.countByUserUserId(userId) > 0) {
             return;
@@ -189,5 +189,5 @@ public class FoodService {
             e.printStackTrace();
             return null;
         }
-    }
+    }*/
 }
