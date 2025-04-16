@@ -7,6 +7,7 @@ import com.example.biofitbe.repository.NotificationRepository;
 import com.example.biofitbe.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -22,6 +23,9 @@ public class NotificationService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     // hàm kiểm tra xem thời gian target
     private LocalDateTime getNextValidTime(int hour, int minute) {
@@ -51,6 +55,7 @@ public class NotificationService {
                 .build();
 
         notificationRepository.save(notification);
+        sendWebSocketNotification(userId, NotificationDTO.fromEntity(notification));
 
         // Thông báo nhắc nhở sau 5 phút
         Notification reminder = Notification.builder()
@@ -66,6 +71,7 @@ public class NotificationService {
                 .build();
 
         notificationRepository.save(reminder);
+        sendWebSocketNotification(userId, NotificationDTO.fromEntity(reminder));
     }
 
     private void scheduleLunchNotifications(String userId) {
@@ -86,6 +92,7 @@ public class NotificationService {
                 .build();
 
         notificationRepository.save(notification);
+        sendWebSocketNotification(userId, NotificationDTO.fromEntity(notification));
 
         // Thông báo nhắc nhở sau 10 phút
         Notification reminder = Notification.builder()
@@ -101,6 +108,7 @@ public class NotificationService {
                 .build();
 
         notificationRepository.save(reminder);
+        sendWebSocketNotification(userId, NotificationDTO.fromEntity(reminder));
     }
 
     private void scheduleDinnerNotifications(String userId) {
@@ -121,6 +129,7 @@ public class NotificationService {
                 .build();
 
         notificationRepository.save(notification);
+        sendWebSocketNotification(userId, NotificationDTO.fromEntity(notification));
 
         // Thông báo nhắc nhở sau 10 phút
         Notification reminder = Notification.builder()
@@ -136,6 +145,7 @@ public class NotificationService {
                 .build();
 
         notificationRepository.save(reminder);
+        sendWebSocketNotification(userId, NotificationDTO.fromEntity(reminder));
     }
 
     private void scheduleSnackNotifications(String userId) {
@@ -159,6 +169,7 @@ public class NotificationService {
                     .build();
 
             notificationRepository.save(morningSnackNotification);
+            sendWebSocketNotification(userId, NotificationDTO.fromEntity(morningSnackNotification));
         }
         // Nếu là 14h chiều - Snack buổi chiều
         else if (now.getHour() == 14) {
@@ -178,6 +189,7 @@ public class NotificationService {
                     .build();
 
             notificationRepository.save(afternoonSnackNotification);
+            sendWebSocketNotification(userId, NotificationDTO.fromEntity(afternoonSnackNotification));
         }
     }
 
@@ -199,6 +211,7 @@ public class NotificationService {
                 .build();
 
         notificationRepository.save(notification);
+        sendWebSocketNotification(userId, NotificationDTO.fromEntity(notification));
 
         // Thông báo nhắc nhở sau 5 phút
         Notification reminder = Notification.builder()
@@ -214,6 +227,7 @@ public class NotificationService {
                 .build();
 
         notificationRepository.save(reminder);
+        sendWebSocketNotification(userId, NotificationDTO.fromEntity(reminder));
     }
 
     public List<NotificationDTO> getUserNotifications(String userId) {
@@ -251,7 +265,7 @@ public class NotificationService {
         return notificationRepository.save(notification);
     }
 
-    @Scheduled(cron = "0 0 1,7,10,12,14,18,22 * * ?")
+    @Scheduled(cron = "0 0 0,7,10,12,14,18,22 * * ?")
     @Transactional
     public void sendScheduledMealNotifications() {
         LocalDateTime now = LocalDateTime.now();
@@ -271,7 +285,7 @@ public class NotificationService {
                 scheduleSnackNotifications(String.valueOf(userId));
             } else if (now.getHour() == 22) {
                 scheduleSleepNotification(String.valueOf(userId));
-            }   else if (now.getHour() == 1) {
+            }   else if (now.getHour() == 0) {
                 createWelcomeNotification(String.valueOf(userId));
             }
         });
@@ -291,7 +305,7 @@ public class NotificationService {
                 .priority(1)
                 .isReminderSent(false)  
                 .build();
-
+        sendWebSocketNotification(userId, NotificationDTO.fromEntity(notification));
         return notificationRepository.save(notification);
     }
 
@@ -303,6 +317,10 @@ public class NotificationService {
     @Transactional
     public void deleteAllNotifications(String userId) {
         notificationRepository.deleteByUserId(userId);
+    }
+
+    private void sendWebSocketNotification(String userId, NotificationDTO notificationDTO) {
+        messagingTemplate.convertAndSend("/topic/notifications/" + userId, notificationDTO);
     }
 
 }
